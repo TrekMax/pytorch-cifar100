@@ -151,7 +151,8 @@ if __name__ == '__main__':
     import linger
     net = net.cuda()
     # 设置模型输入大小
-    dummy_input = torch.randn(8, 3, 32, 32, requires_grad=True).cuda()
+    dummy_input = torch.randn(1, 3, 32, 32, requires_grad=True).cuda()
+
     # 使用 linger 进行浮点约束设置
     train_mode = "clamp"
     # net 为初始化模型结构，dummy_input 为模型输入数据
@@ -163,6 +164,22 @@ if __name__ == '__main__':
     # linger.normalize_module(net.mid_conv, type_modules = type_modules, normalize_weight_value=16, normalize_bias_value=16, normalize_output_value=16)
     # 模型量化设置，量化为 int8
     model = linger.normalize_layers(net, normalize_modules = normalize_modules, normalize_weight_value=8, normalize_bias_value=8, normalize_output_value=8)
+
+
+    # # 使用 linger 进行浮点约束设置
+    # train_mode = "quant" # clamp: 浮点训练范围约束；quant: 量化训练阶段
+    # # net 为初始化模型结构，dummy_input 为模型输入数据
+    # linger.trace_layers(net, net, dummy_input, fuse_bn=True)
+    # # linger.disable_normalize(net.fc) # 设置不量化的层
+    # # type_modules  = (nn.Conv2d)
+    # # 设置需要量化的层，可使用默认值
+    # normalize_modules = (nn.Conv2d, nn.Linear, nn.BatchNorm2d)
+    # replace_tuple = (nn.Conv2d, nn.Linear, nn.BatchNorm2d, nn.AvgPool2d)
+    # # linger.normalize_module(net.mid_conv, type_modules = type_modules, normalize_weight_value=16, normalize_bias_value=16, normalize_output_value=16)
+    # # 模型量化设置，量化为 int8
+    # net = linger.normalize_layers(net, normalize_modules = normalize_modules, normalize_weight_value=8, normalize_bias_value=8, normalize_output_value=8)
+    # net = linger.init(net, quant_modules=replace_tuple, mode=linger.QuantMode.QValue)
+    # net.load_state_dict(torch.load("./checkpoint/resnet18/Monday_11_November_2024_15h_37m_10s/resnet18-187-best.pth"))
 
     # ------------
     loss_function = nn.CrossEntropyLoss()
